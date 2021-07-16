@@ -14,7 +14,7 @@ private:
     static constexpr uint32_t WIDTH = 800;
     static constexpr uint32_t HEIGHT = 600;
 
-    Window window = Window(WIDTH, HEIGHT, "Raytracer in Vulkan");
+    Window window = Window(WIDTH, HEIGHT, "Renderer in Vulkan");
     Device device = Device(window);
     SwapChain swap_chain = SwapChain(this->device, this->window.get_extent());
 
