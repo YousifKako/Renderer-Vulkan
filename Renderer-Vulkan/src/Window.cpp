@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <iostream>
 
 #include <Window.hpp>
 
@@ -7,9 +8,11 @@ Window::Window(const uint32_t& width, const uint32_t& height, const std::string&
 {
     glfwInit();
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
     this->window = glfwCreateWindow(this->width, this->height, this->name.c_str(), nullptr, nullptr);
+    glfwSetWindowUserPointer(this->window, this);
+    glfwSetFramebufferSizeCallback(this->window, this->frame_buffer_resized_callback);
 }
 
 Window::~Window()
@@ -34,4 +37,13 @@ VkExtent2D
 Window::get_extent()
 {
     return { this->width, this->height };
+}
+
+void Window::frame_buffer_resized_callback(GLFWwindow* window_, int width, int height)
+{
+    auto window = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window_));
+    window->frame_buffer_resized = true;
+    window->width = width;
+    window->height = height;
+
 }

@@ -14,9 +14,12 @@ class Window
 {
 private:
     GLFWwindow* window = nullptr;
-    const uint32_t width = 0;
-    const uint32_t height = 0;
+    uint32_t width = 0;
+    uint32_t height = 0;
     const std::string name = "";
+    bool frame_buffer_resized = false;
+
+    static void frame_buffer_resized_callback(GLFWwindow* window, int width, int height);
 
 public:
     Window(const uint32_t& width, const uint32_t& height, const std::string& name);
@@ -29,4 +32,6 @@ public:
     bool should_close();
     void create_window_surface(const VkInstance& instance, VkSurfaceKHR* const surface);
     VkExtent2D get_extent();
+    bool was_window_resized() { return this->frame_buffer_resized; }
+    void reset_window_resized_flag() { this->frame_buffer_resized = false; }
 };

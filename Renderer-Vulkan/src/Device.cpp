@@ -47,12 +47,12 @@ void DestroyDebugUtilsMessengerEXT(
 
 // class member functions
 Device::Device(Window& window) : window{ window } {
-    createInstance();
-    setupDebugMessenger();
-    createSurface();
-    pickPhysicalDevice();
-    createLogicalDevice();
-    createCommandPool();
+    this->createInstance();
+    this->setupDebugMessenger();
+    this->createSurface();
+    this->pickPhysicalDevice();
+    this->createLogicalDevice();
+    this->createCommandPool();
 }
 
 Device::~Device() {

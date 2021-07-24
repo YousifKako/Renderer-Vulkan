@@ -6,7 +6,7 @@
 #include <Device.hpp>
 #include <Model.hpp>
 
-Pipeline::Pipeline(Device& device, const std::string_view& vert_path, const std::string_view& frag_path, const PipelineConfig& config) :
+Pipeline::Pipeline(Device& device, const std::string_view& vert_path, const std::string_view& frag_path, const PipelineConfigInfo& config) :
     device(device)
 {
     this->create_graphics_pipeline(vert_path, frag_path, config);
@@ -37,7 +37,7 @@ Pipeline::read_file(const std::string& file_path)
     return buffer;
 }
 
-void Pipeline::create_graphics_pipeline(const std::string_view& vert_path, const std::string_view& frag_path, const PipelineConfig& config)
+void Pipeline::create_graphics_pipeline(const std::string_view& vert_path, const std::string_view& frag_path, const PipelineConfigInfo& config)
 {
     auto vert_code = this->read_file(vert_path.data());
     auto frag_code = this->read_file(frag_path.data());
@@ -76,13 +76,6 @@ void Pipeline::create_graphics_pipeline(const std::string_view& vert_path, const
     vertex_input_info.pVertexAttributeDescriptions = attribute_descriptions.data();
     vertex_input_info.pVertexBindingDescriptions = binding_descriptions.data();
 
-    VkPipelineViewportStateCreateInfo viewport_info = { };
-    viewport_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-    viewport_info.viewportCount = 1;
-    viewport_info.pViewports = &config.viewport;
-    viewport_info.scissorCount = 1;
-    viewport_info.pScissors = &config.scissor;
-
     VkPipelineColorBlendAttachmentState color_blend_attachment = { };
     color_blend_attachment.colorWriteMask =
         VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
@@ -112,13 +105,13 @@ void Pipeline::create_graphics_pipeline(const std::string_view& vert_path, const
     graphics_pipeline_info.pStages = shader_stage;
     graphics_pipeline_info.pVertexInputState = &vertex_input_info;
     graphics_pipeline_info.pInputAssemblyState = &config.input_assembly_input;
-    graphics_pipeline_info.pViewportState = &viewport_info;
+    graphics_pipeline_info.pViewportState = &config.viewport_info;
     graphics_pipeline_info.pRasterizationState = &config.rasterization_info;
     graphics_pipeline_info.pMultisampleState = &config.multisample_info;
     graphics_pipeline_info.pColorBlendState = &color_blend_info;
     graphics_pipeline_info.pDepthStencilState = &config.depth_stencil_info;
 
-    graphics_pipeline_info.pDynamicState = nullptr;
+    graphics_pipeline_info.pDynamicState = &config.dynamic_state_info;
     graphics_pipeline_info.layout = config.pipeline_layout;
     graphics_pipeline_info.renderPass = config.render_pass;
     graphics_pipeline_info.subpass = config.subpass;
@@ -141,23 +134,17 @@ void Pipeline::create_shader_module(const std::vector<char>& code, VkShaderModul
         throw std::runtime_error("Failed to Create Shader Module");
 }
 
-const PipelineConfig
-Pipeline::default_pipeline_config(const uint32_t width, uint32_t height)
+void Pipeline::default_pipeline_config(PipelineConfigInfo& config)
 {
-    PipelineConfig config = PipelineConfig();
     config.input_assembly_input.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
     config.input_assembly_input.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     config.input_assembly_input.primitiveRestartEnable = VK_FALSE;
 
-    config.viewport.x = 0.f;
-    config.viewport.y = 20.f;
-    config.viewport.width = static_cast<float>(width);
-    config.viewport.height = static_cast<float>(height);
-    config.viewport.minDepth = 0.f;
-    config.viewport.maxDepth = 1.f;
-
-    config.scissor.offset = { 0, 0 };
-    config.scissor.extent = { width, height };
+    config.viewport_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    config.viewport_info.viewportCount = 1;
+    config.viewport_info.pViewports = nullptr;
+    config.viewport_info.scissorCount = 1;
+    config.viewport_info.pScissors = nullptr;
 
     config.rasterization_info.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
     config.rasterization_info.depthClampEnable = VK_FALSE;
@@ -190,7 +177,11 @@ Pipeline::default_pipeline_config(const uint32_t width, uint32_t height)
     config.depth_stencil_info.front = {};  // Optional
     config.depth_stencil_info.back = {};   // Optional
 
-    return config;
+    config.dynamic_state_enables = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
+    config.dynamic_state_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    config.dynamic_state_info.pDynamicStates = config.dynamic_state_enables.data();
+    config.dynamic_state_info.dynamicStateCount = static_cast<uint32_t>(config.dynamic_state_enables.size());
+    config.dynamic_state_info.flags = 0;
 }
 
 void Pipeline::bind(const VkCommandBuffer& command_buffer)
