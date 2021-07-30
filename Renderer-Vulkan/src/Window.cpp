@@ -3,6 +3,14 @@
 
 #include <Window.hpp>
 
+void Window::frameBufferResizedCallback(GLFWwindow* window_, int width, int height)
+{
+    auto window                = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window_));
+    window->frameBufferResized = true;
+    window->width              = width;
+    window->height             = height;
+}
+
 Window::Window(const uint32_t& width, const uint32_t& height, const std::string& name) :
     width(width), height(height), name(name)
 {
@@ -12,7 +20,7 @@ Window::Window(const uint32_t& width, const uint32_t& height, const std::string&
 
     this->window = glfwCreateWindow(this->width, this->height, this->name.c_str(), nullptr, nullptr);
     glfwSetWindowUserPointer(this->window, this);
-    glfwSetFramebufferSizeCallback(this->window, this->frame_buffer_resized_callback);
+    glfwSetFramebufferSizeCallback(this->window, this->frameBufferResizedCallback);
 }
 
 Window::~Window()
@@ -22,28 +30,20 @@ Window::~Window()
 }
 
 bool
-Window::should_close()
+Window::shouldClose()
 {
     return glfwWindowShouldClose(this->window);
 }
 
-void Window::create_window_surface(const VkInstance& instance, VkSurfaceKHR* const surface)
+void
+Window::createWindowSurface(const VkInstance& instance, VkSurfaceKHR* const surface)
 {
     if (glfwCreateWindowSurface(instance, this->window, nullptr, surface) != VK_SUCCESS)
         throw std::runtime_error("Failed to Create Window Surface");
 }
 
 VkExtent2D
-Window::get_extent()
+Window::getExtent()
 {
     return { this->width, this->height };
-}
-
-void Window::frame_buffer_resized_callback(GLFWwindow* window_, int width, int height)
-{
-    auto window = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window_));
-    window->frame_buffer_resized = true;
-    window->width = width;
-    window->height = height;
-
 }

@@ -6,70 +6,73 @@
 Model::Model(Device& device, const std::vector<Vertex>& vertices) :
     device(device)
 {
-    this->create_vertex_buffers(vertices);
+    this->createVertexBuffers(vertices);
 }
 
 Model::~Model()
 {
-    vkDestroyBuffer(this->device.device(), this->vertex_buffer, nullptr);
-    vkFreeMemory(this->device.device(), this->vertex_buffer_memory, nullptr);
+    vkDestroyBuffer(this->device.device(), this->vertexBuffer, nullptr);
+    vkFreeMemory(this->device.device(), this->vertexBufferMemory, nullptr);
 }
 
 std::vector<VkVertexInputBindingDescription>
-Model::Vertex::get_binding_descriptions()
+Model::Vertex::getBindingDescriptions()
 {
-    std::vector<VkVertexInputBindingDescription> binding_descriptions(1);
-    binding_descriptions[0].binding = 0;
-    binding_descriptions[0].stride = sizeof(Vertex);
-    binding_descriptions[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+    std::vector<VkVertexInputBindingDescription> bindingDescriptions(1);
+    bindingDescriptions[0].binding   = 0;
+    bindingDescriptions[0].stride    = sizeof(Vertex);
+    bindingDescriptions[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-    return binding_descriptions;
+    return bindingDescriptions;
 }
 
 std::vector<VkVertexInputAttributeDescription>
-Model::Vertex::get_attribute_descriptions()
+Model::Vertex::getAttributeDescriptions()
 {
-    std::vector<VkVertexInputAttributeDescription> attribute_descriptions(2);
-    attribute_descriptions[0].binding = 0;
-    attribute_descriptions[0].location = 0;
-    attribute_descriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
-    attribute_descriptions[0].offset = offsetof(Vertex, position);
+    std::vector<VkVertexInputAttributeDescription> attributeDescriptions(2);
+    attributeDescriptions[0].binding  = 0;
+    attributeDescriptions[0].location = 0;
+    attributeDescriptions[0].format   = VK_FORMAT_R32G32_SFLOAT;
+    attributeDescriptions[0].offset   = offsetof(Vertex, position);
 
-    attribute_descriptions[1].binding = 0;
-    attribute_descriptions[1].location = 1;
-    attribute_descriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-    attribute_descriptions[1].offset = offsetof(Vertex, color);
+    attributeDescriptions[1].binding  = 0;
+    attributeDescriptions[1].location = 1;
+    attributeDescriptions[1].format   = VK_FORMAT_R32G32B32_SFLOAT;
+    attributeDescriptions[1].offset   = offsetof(Vertex, color);
 
-    return attribute_descriptions;
+    return attributeDescriptions;
 }
 
-void Model::create_vertex_buffers(const std::vector<Vertex>& vertices)
+void
+Model::createVertexBuffers(const std::vector<Vertex>& vertices)
 {
-    this->vertex_count = static_cast<uint32_t>(vertices.size());
-    assert(this->vertex_count >= 3 && "Vertex Count Must be At Least 3");
+    this->vertexCount = static_cast<uint32_t>(vertices.size());
+    assert(this->vertexCount >= 3 && "Vertex Count Must be At Least 3");
 
-    VkDeviceSize buffer_size = sizeof(vertices[0]) * this->vertex_count;
-    this->device.createBuffer(buffer_size,
+    VkDeviceSize bufferSize = sizeof(vertices[0]) * this->vertexCount;
+    this->device.createBuffer(bufferSize,
         VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        this->vertex_buffer,
-        this->vertex_buffer_memory);
+        this->vertexBuffer,
+        this->vertexBufferMemory);
 
     void* data = nullptr;
-    vkMapMemory(this->device.device(), this->vertex_buffer_memory, 0, buffer_size, 0, &data);
-    memcpy(data, vertices.data(), static_cast<size_t>(buffer_size));
-    vkUnmapMemory(this->device.device(), this->vertex_buffer_memory);
+    vkMapMemory(this->device.device(), this->vertexBufferMemory, 0, bufferSize, 0, &data);
+    memcpy(data, vertices.data(), static_cast<size_t>(bufferSize));
+    vkUnmapMemory(this->device.device(), this->vertexBufferMemory);
 }
 
-void Model::bind(const VkCommandBuffer& command_buffer)
+void
+Model::bind(const VkCommandBuffer& commandBuffer)
 {
-    const VkBuffer buffers[] = { this->vertex_buffer };
+    const VkBuffer buffers[]    = { this->vertexBuffer };
     const VkDeviceSize offset[] = { 0 };
 
-    vkCmdBindVertexBuffers(command_buffer, 0, 1, buffers, offset);
+    vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offset);
 }
 
-void Model::draw(const VkCommandBuffer& command_buffer)
+void
+Model::draw(const VkCommandBuffer& commandBuffer)
 {
-    vkCmdDraw(command_buffer, this->vertex_count, 1, 0, 0);
+    vkCmdDraw(commandBuffer, this->vertexCount, 1, 0, 0);
 }

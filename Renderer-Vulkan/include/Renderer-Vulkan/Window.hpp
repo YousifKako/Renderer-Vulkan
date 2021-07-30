@@ -13,25 +13,25 @@
 class Window
 {
 private:
-    GLFWwindow* window = nullptr;
-    uint32_t width = 0;
-    uint32_t height = 0;
-    const std::string name = "";
-    bool frame_buffer_resized = false;
+    GLFWwindow* window      = nullptr;
+    uint32_t width          = 0;
+    uint32_t height         = 0;
+    const std::string name  = "";
+    bool frameBufferResized = false;
 
-    static void frame_buffer_resized_callback(GLFWwindow* window, int width, int height);
+    static void frameBufferResizedCallback(GLFWwindow* window, int width, int height);
 
 public:
     Window(const uint32_t& width, const uint32_t& height, const std::string& name);
     ~Window();
 
     // Delete copy constructor and copy operator
-    Window(const Window&) = delete;
+    Window(const Window&)            = delete;
     Window& operator=(const Window&) = delete;
 
-    bool should_close();
-    void create_window_surface(const VkInstance& instance, VkSurfaceKHR* const surface);
-    VkExtent2D get_extent();
-    bool was_window_resized() { return this->frame_buffer_resized; }
-    void reset_window_resized_flag() { this->frame_buffer_resized = false; }
+    bool shouldClose();
+    void createWindowSurface(const VkInstance& instance, VkSurfaceKHR* const surface);
+    VkExtent2D getExtent();
+    bool wasWindowResized()       { return this->frameBufferResized;  }
+    void resetWindowResizedFlag() { this->frameBufferResized = false; }
 };
