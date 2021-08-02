@@ -36,6 +36,18 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Objects\Object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\RenderSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Renderer-Vulkan\Application.hpp">
@@ -56,12 +68,26 @@
     <ClInclude Include="include\Renderer-Vulkan\Window.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Renderer-Vulkan\Objects\Object.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer-Vulkan\Rendering\Renderer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer-Vulkan\Rendering\RenderSystem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer-Vulkan\Camera.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Shaders\Sample.frag" />
     <None Include="Assets\Shaders\compile.bat">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="Assets\Shaders\Sample.vert" />
+    <None Include="Assets\Shaders\Fragment.frag" />
+    <None Include="Assets\Shaders\Fragment.frag.spv" />
+    <None Include="Assets\Shaders\Vertex.vert" />
+    <None Include="Assets\Shaders\Vertex.vert.spv" />
   </ItemGroup>
 </Project>

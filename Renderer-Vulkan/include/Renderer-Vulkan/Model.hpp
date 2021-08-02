@@ -17,7 +17,7 @@ private:
 public:
     struct Vertex
     {
-        glm::vec2 position = glm::vec2();
+        glm::vec3 position = glm::vec3();
         glm::vec3 color    = glm::vec3();
 
         static std::vector<VkVertexInputBindingDescription> getBindingDescriptions();

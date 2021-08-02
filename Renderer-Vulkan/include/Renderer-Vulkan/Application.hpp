@@ -3,35 +3,23 @@
 #include <memory>
 
 #include <Window.hpp>
-#include <Pipeline.hpp>
 #include <Device.hpp>
-#include <SwapChain.hpp>
-#include <Model.hpp>
+#include <Objects/Object.hpp>
+#include <Rendering/Renderer.hpp>
 
 class Application
 {
 private:
-    static constexpr uint32_t WIDTH             = 800;
-    static constexpr uint32_t HEIGHT            = 600;
+    static constexpr uint32_t WIDTH    = 800;
+    static constexpr uint32_t HEIGHT   = 600;
 
-    Window window                               = Window(WIDTH, HEIGHT, "Renderer in Vulkan");
-    Device device                               = Device(window);
-    std::unique_ptr<SwapChain> swapChain        = nullptr;
+    Window window                      = Window(WIDTH, HEIGHT, "Renderer in Vulkan");
+    Device device                      = Device(window);
+    Renderer renderer                  = { window, device };
 
-    std::unique_ptr<Pipeline> pipeline          = nullptr;
-    VkPipelineLayout pipelineLayout             = nullptr;
-    std::vector<VkCommandBuffer> commandBuffers = { };
+    std::vector<Object> objects        = { };
 
-    std::unique_ptr<Model> model                = nullptr;
-
-    void loadModels();
-    void createPiplineLayout();
-    void createPipeline();
-    void createCommandBuffers();
-    void freeCommandBuffers();
-    void drawFrame();
-    void recreateSwapChain();
-    void recordCommandBuffer(int imageIndex);
+    void loadObjects();
 
 public:
     Application();

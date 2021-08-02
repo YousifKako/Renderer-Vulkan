@@ -81,7 +81,7 @@ SwapChain::submitCommandBuffers(const VkCommandBuffer* buffers, uint32_t* imageI
     if (imagesInFlight[*imageIndex] != VK_NULL_HANDLE)
         vkWaitForFences(device.device(), 1, &imagesInFlight[*imageIndex], VK_TRUE, UINT64_MAX);
 
-    imagesInFlight[*imageIndex] = inFlightFences[currentFrame];
+    imagesInFlight[*imageIndex]       = inFlightFences[currentFrame];
 
     VkSubmitInfo submitInfo           = { };
     submitInfo.sType                  = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -117,6 +117,12 @@ SwapChain::submitCommandBuffers(const VkCommandBuffer* buffers, uint32_t* imageI
     currentFrame                   = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
     return vkQueuePresentKHR(device.presentQueue(), &presentInfo);
+}
+
+bool SwapChain::compareSwapFormat(const SwapChain& swapChain) const
+{
+    return swapChain.swapChainDepthFormat == this->swapChainDepthFormat &&
+           swapChain.swapChainImageFormat == this->swapChainImageFormat;
 }
 
 void
@@ -302,6 +308,7 @@ void
 SwapChain::createDepthResources()
 {
     VkFormat depthFormat       = findDepthFormat();
+    swapChainDepthFormat       = depthFormat;
     VkExtent2D swapChainExtent = getSwapChainExtent();
 
     depthImages.resize(imageCount());
@@ -387,15 +394,15 @@ SwapChain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availableP
 {
     for (const auto& availablePresentMode : availablePresentModes)
     {
-        //if (availablePresentMode == VK_PRESENT_MODE_FIFO_KHR) {
-        //    std::cout << "Present mode: V-Sync" << std::endl;
-        //    return availablePresentMode;
-        //}
-        if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
-        {
-            std::cout << "Present mode: Mailbox" << std::endl;
+        if (availablePresentMode == VK_PRESENT_MODE_FIFO_KHR) {
+            std::cout << "Present mode: V-Sync" << std::endl;
             return availablePresentMode;
         }
+        //if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
+        //{
+        //    std::cout << "Present mode: Mailbox" << std::endl;
+        //    return availablePresentMode;
+        //}
     }
 
     // for (const auto &availablePresentMode : availablePresentModes) {
