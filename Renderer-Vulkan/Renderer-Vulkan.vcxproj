@@ -175,6 +175,7 @@
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Device.cpp" />
+    <ClCompile Include="src\KeyboardMovementController.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Objects\Object.cpp" />
     <ClCompile Include="src\Pipeline.cpp" />
@@ -187,12 +188,15 @@
     <ClInclude Include="include\Renderer-Vulkan\Application.hpp" />
     <ClInclude Include="include\Renderer-Vulkan\Camera.hpp" />
     <ClInclude Include="include\Renderer-Vulkan\Device.hpp" />
+    <ClInclude Include="include\Renderer-Vulkan\KeyboardMovementController.hpp" />
     <ClInclude Include="include\Renderer-Vulkan\Model.hpp" />
     <ClInclude Include="include\Renderer-Vulkan\Objects\Object.hpp" />
+    <ClInclude Include="include\Renderer-Vulkan\Objects\ObjectLoader.h" />
     <ClInclude Include="include\Renderer-Vulkan\Pipeline.hpp" />
     <ClInclude Include="include\Renderer-Vulkan\Rendering\Renderer.hpp" />
     <ClInclude Include="include\Renderer-Vulkan\Rendering\RenderSystem.hpp" />
     <ClInclude Include="include\Renderer-Vulkan\SwapChain.hpp" />
+    <ClInclude Include="include\Renderer-Vulkan\Utilities.hpp" />
     <ClInclude Include="include\Renderer-Vulkan\Window.hpp" />
   </ItemGroup>
   <ItemGroup>

@@ -10,7 +10,7 @@
 
 struct PushConstantData
 {
-    glm::mat4 transform{1.0f };
+    glm::mat4 transform = { };
     alignas(16) glm::vec3 color;
 };
 
@@ -71,9 +71,6 @@ RenderSystem::renderObjects(VkCommandBuffer commandBuffer, std::vector<Object>& 
 
     for (auto& object : objects)
     {
-        object.transform.rotation.y = glm::mod(object.transform.rotation.y + 0.01f, glm::two_pi<float>());
-        object.transform.rotation.x = glm::mod(object.transform.rotation.x + 0.005f, glm::two_pi<float>());
-
         PushConstantData push = { };
         push.color            = object.color;
 

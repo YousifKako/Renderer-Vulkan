@@ -1,3 +1,4 @@
+#include <chrono>
 #include <stdexcept>
 #include <array>
 
@@ -8,6 +9,7 @@
 
 #include <Application.hpp>
 #include <Rendering/RenderSystem.hpp>
+#include <KeyboardMovementController.hpp>
 #include <Camera.hpp>
 
 Application::Application()
@@ -23,15 +25,27 @@ Application::run()
     RenderSystem renderSystem = { this->device, this->renderer.getSwapChainRenderPass() };
     Camera camera             = { };
 
-    // camera.setViewDirection(glm::vec3(0.0f), glm::vec3(0.5f, 0.0f, 1.0f));
-    camera.setViewTarget(glm::vec3(-1.0f, -2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 2.5f));
+    //camera.setViewDirection(glm::vec3(0.0f), glm::vec3(0.5f, 0.0f, 1.0f));
+    //camera.setViewTarget(glm::vec3(-1.0f, -2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 2.5f));
+
+    KeyboardMovementController cameraController = { };
+    Object viewerObject                         = Object::createObject();
+    auto currentTime                            = std::chrono::high_resolution_clock::now();
 
     while (!window.shouldClose())
     {
         glfwPollEvents();
 
+        auto newTime = std::chrono::high_resolution_clock::now();
+        float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
+        currentTime = newTime;
+        frameTime = glm::min(frameTime, 0.2f);
+
+        cameraController.moveInPlaneXZ(this->window.getGLFWwindow(), frameTime, viewerObject);
+        camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
+
         float aspect = this->renderer.getAspectRatio();
-        camera.setPerspectiveProjection(glm::radians(55.0f), aspect, 0.1f, 10.0f);
+        camera.setPerspectiveProjection(glm::radians(55.0f), aspect, 0.1f, 20.0f);
 
         if (auto commandBuffer = this->renderer.beginFrame())
         {
@@ -45,76 +59,15 @@ Application::run()
     vkDeviceWaitIdle(this->device.device());
 }
 
-std::unique_ptr<Model>
-createCubeModel(Device& device, glm::vec3 offset)
-{
-    std::vector<Model::Vertex> vertices = 
-    {
-        // left face (white)
-        {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
-        {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
-        {{-.5f, -.5f, .5f}, {.9f, .9f, .9f}},
-        {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
-        {{-.5f, .5f, -.5f}, {.9f, .9f, .9f}},
-        {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
-
-        // right face (yellow)
-        {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
-        {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
-        {{.5f, -.5f, .5f}, {.8f, .8f, .1f}},
-        {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
-        {{.5f, .5f, -.5f}, {.8f, .8f, .1f}},
-        {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
-
-        // top face (orange, remember y axis points down)
-        {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
-        {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
-        {{-.5f, -.5f, .5f}, {.9f, .6f, .1f}},
-        {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
-        {{.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
-        {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
-
-        // bottom face (red)
-        {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
-        {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
-        {{-.5f, .5f, .5f}, {.8f, .1f, .1f}},
-        {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
-        {{.5f, .5f, -.5f}, {.8f, .1f, .1f}},
-        {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
-
-        // nose face (blue)
-        {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
-        {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
-        {{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
-        {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
-        {{.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
-        {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
-
-        // tail face (green)
-        {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-        {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-        {{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-        {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-        {{.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-        {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-
-    };
-
-    for (auto& v : vertices)
-        v.position += offset;
-
-    return std::make_unique<Model>(device, vertices);
-}
-
 void
 Application::loadObjects()
 {
-    std::shared_ptr<Model> model = createCubeModel(this->device, { 0.0f, 0.0f, 0.0f });
-    auto cube                    = Object::createObject();
-    cube.model                   = model;
-    cube.color                   = { 0.1f, 0.8f, 0.1f };
-    cube.transform.translation   = { 0.0f, 0.0f, 2.5f };
-    cube.transform.scale         = { 0.5f, 0.5f, 0.5f };
+    std::shared_ptr<Model> model    = Model::createModelFromFile(this->device, "Assets/Scenes/Test.obj");
+    auto objects                    = Object::createObject();
+    objects.model                   = model;
+    objects.color                   = { 0.1f, 0.8f, 0.1f };
+    objects.transform.translation   = { 0.0f, 0.0f, 2.5f };
+    objects.transform.scale         = { 0.5f, 0.5f, 0.5f };
 
-    this->objects.push_back(std::move(cube));
+    this->objects.push_back(std::move(objects));
 }
